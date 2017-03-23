@@ -28,8 +28,10 @@ default_query = """
 }
 """.strip()
 
-# It's like HTTP routes but instead, it directs you to /graphql (Schema). graphiq = True will initiate the GUI
-app.add_route(GraphQLView.as_view(schema=schema, graphql=True, graphiq=True), '/graphql')
+# It's like HTTP routes but instead, it directs you to /graphql (Schema).
+# graphiq = True will initiate the GUI
+app.add_route(GraphQLView.as_view(
+    schema=schema, graphql=True, graphiq=True), '/graphql')
 
 # runs the app and database. init_db contains seed data.
 if __name__ == '__main__':
