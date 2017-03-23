@@ -2,7 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-engine = create_engine('sqlite:///darabase.sqlite3', convert_unicode=True)
+# Create database
+engine = create_engine('sqlite:///database.sqlite3', convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
@@ -36,5 +37,5 @@ async def init_db():
     tracy = Employee(name='Tracy', department=hr, role=manager)
     db_session.add(tracy)
 
+    # Insert seed data into database
     db_session.commit()
-

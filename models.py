@@ -1,9 +1,10 @@
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import backref, relationships
 
-from practice_files.graphane_practice.app.database import Base
+from database import Base
 
 
+# Basic SQLAlchemy
 class Department(Base):
     __tablename__ = 'department'
     id = Column(Integer, primary_key=True)
@@ -33,4 +34,3 @@ class Employee(Base):
         backref=backref('roles',
                         uselist=True,
                         cascade='delete,all'))
-
