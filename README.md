@@ -1,13 +1,9 @@
 Example Sanic + SQLAlchemy + Graphene (Graphql) Project
 ================================
 
-This example project demos integration between Graphene, Flask and SQLAlchemy.
-The project contains two models, one named `Department` and another
+This example project demos integration between Graphene, Sanic and SQLAlchemy.
+The project contains two models, one named `Department`, `Role` and another
 named `Employee`.
-
-Getting started
----------------
-
 
 # sanic-graphql-example
 Sanic example using Graphsql + SQLAlchemy
