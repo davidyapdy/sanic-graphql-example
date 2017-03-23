@@ -13,7 +13,7 @@ Base.query = db_session.query_property()
 
 
 async def init_db():
-    from practice_files.graphane_practice.app.models import Department, Employee, Role
+    from models import Department, Employee, Role
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
