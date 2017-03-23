@@ -1,5 +1,5 @@
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
-from sqlalchemy.orm import backref, relationships
+from sqlalchemy.orm import backref, relationship
 
 from database import Base
 
@@ -24,12 +24,12 @@ class Employee(Base):
     hired_on = Column(DateTime, default=func.now())
     department_id = Column(Integer, ForeignKey('department.id'))
     role_id = Column(Integer, ForeignKey('roles.role_id'))
-    department = relationships(
+    department = relationship(
         Department,
         backref=backref('employee',
                         uselist=True,
                         cascade='delete,all'))
-    role = relationships(
+    role = relationship(
         Role,
         backref=backref('roles',
                         uselist=True,
