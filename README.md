@@ -19,7 +19,7 @@ Run app.py and access via localhost:5000/graphql
 
 #Tutzz
 1. Build your model first
-```
+```python
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import backref, relationships
 
@@ -59,7 +59,7 @@ class Employee(Base):
 
 ```
 2. Initiate database + seed data + Commit
-```
+```python
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -104,7 +104,7 @@ async def init_db():
 ```
 3. Define your scheme for graphql 
 It is important to know some important terms here like *SQLAlchemyConnectionField* and *relay.Node*. Check out graphene official documentation for more info
-```
+```python
 import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyConnectionField, SQLAlchemyObjectType
@@ -141,7 +141,7 @@ class Query(graphene.ObjectType):
 schema = graphene.Schema(query=Query, types=[Department, Employee, Role])
 ```
 4. Let's run our Sanic App
-```
+```python
 from sanic_graphql import GraphQLView
 from sanic import Sanic
 from database import db_session, init_db
