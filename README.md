@@ -182,3 +182,6 @@ if __name__ == '__main__':
     app.run()
 
 ```
+
+EOF
+Fully focus on my own [design agency](https://zensite.co/) now.    
