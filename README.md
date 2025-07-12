@@ -1,43 +1,124 @@
-Example Sanic + SQLAlchemy + Graphene (Graphql) Project
-================================
+# Sanic + SQLAlchemy + GraphQL Example
 
-This example project demos integration between Graphene, Sanic and SQLAlchemy.
-The project contains two models, one named `Department`, `Role` and another
-named `Employee`.
+A modern, fully updated example project demonstrating integration between **Sanic**, **SQLAlchemy**, and **GraphQL** using Graphene.
 
-# sanic-graphql-example
-Sanic example using Graphsql + SQLAlchemy
+[![Python Version](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://python.org)
+[![Sanic Version](https://img.shields.io/badge/sanic-23.12.1-green.svg)](https://sanic.dev)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Run app.py and access via localhost:5000/graphql
+## 🚀 Quick Start
 
-## Required files
-1. Graphene
-2. Sanic
-3. Graphene-Sqlalchemy
-4. Sqlalchemy
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
+# Run the application
+python app.py
+```
 
-#Tutzz
-1. Build your model first
+Visit http://localhost:8000/graphql to access the GraphQL playground.
+
+## 📋 Features
+
+- **Modern Sanic 23.x** with sanic-ext integration
+- **SQLAlchemy 1.4** with SQLite database
+- **GraphQL API** with relay-style connections
+- **Interactive GraphQL Playground** in browser
+- **Sample data** with employees, departments, and roles
+- **Fully updated dependencies** (2024-ready)
+
+## 🏗️ Project Structure
+
+```
+├── app.py           # Main Sanic application
+├── models.py        # SQLAlchemy database models
+├── database.py      # Database configuration and initialization
+├── schema.py        # GraphQL schema definitions
+└── requirements.txt # Python dependencies
+```
+
+## 📊 Database Models
+
+The project includes three interconnected models:
+
+- **Department**: Company departments (Engineering, HR, etc.)
+- **Role**: Job roles (Manager, Engineer, etc.)  
+- **Employee**: Staff members with department and role relationships
+
+## 🔍 GraphQL Queries
+
+### Get All Employees
+```graphql
+{
+  allEmployee {
+    edges {
+      node {
+        id
+        name
+        hiredOn
+        department {
+          name
+        }
+        role {
+          name
+        }
+      }
+    }
+  }
+}
+```
+
+### Get All Departments
+```graphql
+{
+  allDepartments {
+    edges {
+      node {
+        id
+        name
+      }
+    }
+  }
+}
+```
+
+### Get All Roles
+```graphql
+{
+  allRoles {
+    edges {
+      node {
+        id
+        name
+      }
+    }
+  }
+}
+```
+
+## 🛠️ Dependencies
+
+- **Sanic 23.12.1** - Modern Python web framework
+- **SQLAlchemy 1.4.54** - Database ORM
+- **Graphene 2.1.9** - GraphQL framework
+- **graphene-sqlalchemy 2.3.0** - SQLAlchemy integration for Graphene
+- **sanic-ext 23.12.0** - Sanic extensions
+
+## 🔧 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/graphql` | GraphQL Playground (Interactive UI) |
+| POST | `/graphql` | GraphQL API endpoint |
+
+## 💡 Development Guide
+
+### 1. Database Models (`models.py`)
+Define your SQLAlchemy models with relationships:
+
 ```python
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
-from sqlalchemy.orm import backref, relationships
-
-from database import Base
-
-
-# Basic SQLAlchemy
-class Department(Base):
-    __tablename__ = 'department'
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-
-
-class Role(Base):
-    __tablename__ = 'roles'
-    role_id = Column(Integer, primary_key=True)
-    name = Column(String)
-
+from sqlalchemy.orm import backref, relationship
 
 class Employee(Base):
     __tablename__ = 'employees'
@@ -46,142 +127,81 @@ class Employee(Base):
     hired_on = Column(DateTime, default=func.now())
     department_id = Column(Integer, ForeignKey('department.id'))
     role_id = Column(Integer, ForeignKey('roles.role_id'))
-    department = relationships(
-        Department,
-        backref=backref('employee',
-                        uselist=True,
-                        cascade='delete,all'))
-    role = relationships(
-        Role,
-        backref=backref('roles',
-                        uselist=True,
-                        cascade='delete,all'))
-
+    
+    # Relationships
+    department = relationship(Department, backref='employees')
+    role = relationship(Role, backref='employees')
 ```
-2. Initiate database + seed data + Commit
+
+### 2. GraphQL Schema (`schema.py`)
+Create GraphQL types from SQLAlchemy models:
+
 ```python
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import scoped_session, sessionmaker
-
-# Create database
-engine = create_engine('sqlite:///database.sqlite3', convert_unicode=True)
-db_session = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
-                                         bind=engine))
-
-Base = declarative_base()
-Base.query = db_session.query_property()
-
-
-async def init_db():
-    from models import Department, Employee, Role
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-    # Create Fixture for department
-    engineering = Department(name='Engineering')
-    db_session.add(engineering)
-    hr = Department(name='Human Resource')
-    db_session.add(hr)
-
-    # Create Fixture for Role
-    manager = Role(name='manager')
-    db_session.add(manager)
-    engineer = Role(name='Engineer')
-    db_session.add(engineer)
-
-    # Create
-    peter = Employee(name='Peter', department=engineering, role=manager)
-    db_session.add(peter)
-    roy = Employee(name='Roy', department=engineering, role=engineer)
-    db_session.add(roy)
-    tracy = Employee(name='Tracy', department=hr, role=manager)
-    db_session.add(tracy)
-
-    # Insert seed data into database
-    db_session.commit()
-```
-3. Define your scheme for graphql 
-It is important to know some important terms here like *SQLAlchemyConnectionField* and *relay.Node*. Check out graphene official documentation for more info
-```python
-import graphene
-from graphene import relay
-from graphene_sqlalchemy import SQLAlchemyConnectionField, SQLAlchemyObjectType
-from models import Department as DepartmentModel
-from models import Employee as EmployeeModel
-from models import Role as RoleModel
-
-
-class Department(SQLAlchemyObjectType):
-    class Meta:
-        model = DepartmentModel
-        interfaces = (relay.Node, )
-
+from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
 
 class Employee(SQLAlchemyObjectType):
     class Meta:
         model = EmployeeModel
         interfaces = (relay.Node, )
 
-
-class Role(SQLAlchemyObjectType):
-    class Meta:
-        model = RoleModel
-        interfaces = (relay.Node, )
-
-
 class Query(graphene.ObjectType):
-    node = relay.Node.Field()
     all_employee = SQLAlchemyConnectionField(Employee)
-    all_roles = SQLAlchemyConnectionField(Role)
-    role = graphene.Field(Role)
-
-
-schema = graphene.Schema(query=Query, types=[Department, Employee, Role])
 ```
-4. Let's run our Sanic App
+
+### 3. Sanic Application (`app.py`)
+Modern Sanic setup with GraphQL endpoints:
+
 ```python
-from sanic_graphql import GraphQLView
 from sanic import Sanic
-from database import db_session, init_db
-from schema import schema
+from sanic_ext import Extend
 
 app = Sanic(__name__)
-app.debug = True
+Extend(app)
 
-# This will be the query
-default_query = """
-{
-    allEmployee {
-        edges {
-            node {
-                id,
-                name,
-                department {
-                    id,
-                    name
-                },
-                role {
-                    id,
-                    name
-                }
-            }
-        }
-    }
-}
-""".strip()
-
-# It's like HTTP routes but instead, it directs you to /graphql (Schema).
-# graphiq = True will initiate the GUI
-app.add_route(GraphQLView.as_view(schema=schema, graphiql=True), '/graphql')
-
-# runs the app and database. init_db contains seed data.
-if __name__ == '__main__':
-    init_db()
-    app.run()
-
+@app.post("/graphql")
+async def graphql_handler(request):
+    query = request.json.get("query")
+    result = await graphql(schema, query)
+    return {"data": result.data}
 ```
 
-EOF
-Fully focus on my own [design agency](https://zensite.co/) now.    
+## 🚦 Sample Data
+
+The application automatically creates sample data:
+
+**Departments:**
+- Engineering
+- Human Resources
+
+**Roles:**
+- Manager
+- Engineer
+
+**Employees:**
+- Peter (Engineering Manager)
+- Roy (Software Engineer)
+- Tracy (HR Manager)
+
+## 🔄 What's Updated
+
+This project has been modernized from the original 2016 version:
+
+- ✅ **Sanic 0.4 → 23.12.1** (Modern async web framework)
+- ✅ **SQLAlchemy 1.0 → 1.4** (Latest compatible version)
+- ✅ **Replaced deprecated sanic-graphql** with sanic-ext
+- ✅ **Fixed async/await patterns**
+- ✅ **Updated GraphQL playground**
+- ✅ **Modern Python packaging**
+- ✅ **Improved error handling**
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).

@@ -59,3 +59,7 @@ target/
 
 # SQLite DB
 *.sqlite3
+
+# Claude Code files
+CLAUDE.md
+.claude/

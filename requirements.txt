@@ -1,4 +1,5 @@
-graphene[sqlalchemy]
-SQLAlchemy==1.0.11
-Sanic==0.4.1
-Sanic-GraphQl==1.0.2
+graphene-sqlalchemy==2.3.0
+graphene==2.1.9
+SQLAlchemy==1.4.54
+Sanic==23.12.1
+sanic-ext==23.12.0

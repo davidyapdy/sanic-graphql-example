@@ -1,6 +1,7 @@
 import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyConnectionField, SQLAlchemyObjectType
+from database import db_session
 from models import Department as DepartmentModel
 from models import Employee as EmployeeModel
 from models import Role as RoleModel
@@ -28,6 +29,7 @@ class Query(graphene.ObjectType):
     node = relay.Node.Field()
     all_employee = SQLAlchemyConnectionField(Employee)
     all_roles = SQLAlchemyConnectionField(Role)
+    all_departments = SQLAlchemyConnectionField(Department)
     role = graphene.Field(Role)
 
 
